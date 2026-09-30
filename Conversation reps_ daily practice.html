@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation reps: daily practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--card:#ffffff;--ink:#16202e;--mute:#5b6778;--line:#dbe1ea;
+  --green:#2a7d59;--blue:#2c5fd0;--red:#c2373f;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0f1520;--card:#182131;--ink:#e8edf5;--mute:#9aa7ba;--line:#2a3548;--green:#4cc38f;--blue:#7b9cf5;--red:#f0777d}
+}
+:root[data-theme="dark"]{--bg:#0f1520;--card:#182131;--ink:#e8edf5;--mute:#9aa7ba;--line:#2a3548;--green:#4cc38f;--blue:#7b9cf5;--red:#f0777d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:680px;margin:0 auto;padding:28px 18px 56px}
+h1{font-size:clamp(2rem,7vw,2.9rem);line-height:1.05;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 22px;max-width:52ch}
+.today{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:22px}
+.today-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.today strong{font-size:1.05rem}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 12px}
+.bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .3s}
+.week{display:flex;gap:8px;align-items:center;color:var(--mute);font-size:.85rem;flex-wrap:wrap}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:inline-grid;place-items:center;font-size:.65rem}
+.dot.some{background:color-mix(in srgb,var(--blue) 35%,transparent);border-color:var(--blue)}
+.dot.full{background:var(--blue);border-color:var(--blue);color:#fff}
+.dot.now{outline:2px solid var(--ink);outline-offset:2px}
+.core{margin:0 0 26px;padding:0;list-style:none;display:grid;gap:10px}
+.core li{padding-left:14px;border-left:3px solid var(--line)}
+.core b{display:block}
+.core span{color:var(--mute);font-size:.95rem}
+section.lvl{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:16px 18px 8px;margin-bottom:16px}
+section.lvl h2{margin:0;font-size:1.25rem;color:var(--c)}
+section.lvl p.when{margin:2px 0 10px;color:var(--mute);font-size:.9rem}
+label.task{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+label.task input{position:absolute;opacity:0;pointer-events:none}
+.box{flex:none;width:24px;height:24px;border:2px solid var(--c);border-radius:7px;margin-top:2px;display:grid;place-items:center;color:transparent;font-size:15px;font-weight:800}
+label.task input:checked + .box{background:var(--c);color:#fff}
+label.task input:focus-visible + .box{outline:3px solid var(--ink);outline-offset:2px}
+label.task input:checked ~ .txt{color:var(--mute);text-decoration:line-through}
+.txt b{font-weight:600}
+.txt small{display:block;color:var(--mute);font-size:.88rem;text-decoration:none}
+.g{--c:var(--green)}.b{--c:var(--blue)}.r{--c:var(--red)}
+.log{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:22px}
+.log h2{margin:0 0 8px;font-size:1.15rem}
+.log label{display:block;font-size:.9rem;color:var(--mute);margin-top:10px}
+textarea{width:100%;min-height:64px;margin-top:4px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+button{margin-top:16px;background:none;border:1px solid var(--line);color:var(--mute);border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
+button:hover{color:var(--ink);border-color:var(--ink)}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Conversation reps</h1>
+  <p class="sub">Social skill works like any other skill: small, frequent reps beat rare big performances. Pick the level that fits today.</p>
+
+  <div class="today">
+    <div class="today-top"><strong id="count">0 of 0 done today</strong><span class="week" id="week"></span></div>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="week">Last 7 days, filled by how much you completed</div>
+  </div>
+
+  <ul class="core">
+    <li><b>Attention is the engine.</b><span>Good conversation is mostly noticing the other person and responding to what they actually said.</span></li>
+    <li><b>React, share, ask.</b><span>Every reply can do three small jobs: respond to them, give a detail about you, hand the turn back with a question.</span></li>
+    <li><b>Low stakes, high frequency.</b><span>A hundred tiny reps teach more than one big scary one.</span></li>
+  </ul>
+
+  <section class="lvl g">
+    <h2>Code Green: 2 minutes, every day</h2>
+    <p class="when">The floor. Do these even on a bad day.</p>
+    <div data-tasks="g"></div>
+  </section>
+
+  <section class="lvl b">
+    <h2>Code Blue: 10 minutes, most days</h2>
+    <p class="when">Deliberate practice with one clear skill in focus.</p>
+    <div data-tasks="b"></div>
+  </section>
+
+  <section class="lvl r">
+    <h2>Code Red: stretch, once or twice a week</h2>
+    <p class="when">Slightly uncomfortable on purpose. That is where growth happens.</p>
+    <div data-tasks="r"></div>
+  </section>
+
+  <div class="log">
+    <h2>End-of-day note</h2>
+    <label for="win">One thing that went well</label>
+    <textarea id="win"></textarea>
+    <label for="try">One thing to try tomorrow</label>
+    <textarea id="try"></textarea>
+    <button id="reset" type="button">Clear today's checks</button>
+  </div>
+</main>
+
+<script>
+const TASKS = {
+  g: [
+    ["Greet someone by name, with eye contact","A cashier, neighbour, classmate. Warm and brief."],
+    ["Ask one follow-up question","Something that builds on what they just said, like \u201cWhat made you pick that?\u201d"],
+    ["Keep your phone away in one conversation","Full attention for even five minutes."]
+  ],
+  b: [
+    ["Start one conversation you would usually skip","A family member, a quiet classmate, someone in an online study group."],
+    ["Use react, share, ask in three replies","Respond to them, add a detail of yours, return the turn."],
+    ["Listen without interrupting, then paraphrase once","\u201cSo you\u2019re saying\u2026\u201d Check you understood before you answer."],
+    ["Notice one thing about the other person","Their mood, a new haircut, a hobby they mentioned. Mention it kindly."]
+  ],
+  r: [
+    ["Speak up once in a group setting","A class, club, or group chat where you would normally stay quiet."],
+    ["Explain something you love to a non-expert in 2 minutes","No jargon. Watch their face and adjust."],
+    ["Disagree politely","\u201cI see it a bit differently, because\u2026\u201d Stay curious, not defensive."],
+    ["Ask a trusted person for feedback","\u201cHow do I come across in conversation? What is one thing I could improve?\u201d"]
+  ]
+};
+const KEY = "conv-reps-v1";
+let state = {days:{}, notes:{}};
+try { const raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(e) {}
+if (!state.days) state.days = {}; if (!state.notes) state.notes = {};
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+function dk(d){ const x = d || new Date(); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); }
+const today = dk();
+const ids = [];
+for (const lvl of Object.keys(TASKS)) {
+  const host = document.querySelector('[data-tasks="'+lvl+'"]');
+  TASKS[lvl].forEach((t,i) => {
+    const id = lvl+i; ids.push(id);
+    const l = document.createElement("label"); l.className = "task";
+    const inp = document.createElement("input"); inp.type = "checkbox"; inp.dataset.id = id;
+    const box = document.createElement("span"); box.className = "box"; box.textContent = "\u2713";
+    const txt = document.createElement("span"); txt.className = "txt";
+    const b = document.createElement("b"); b.textContent = t[0];
+    const s = document.createElement("small"); s.textContent = t[1];
+    txt.append(b, s); l.append(inp, box, txt); host.append(l);
+    inp.addEventListener("change", () => {
+      const set = new Set(state.days[today] || []);
+      inp.checked ? set.add(id) : set.delete(id);
+      state.days[today] = [...set]; save(); render();
+    });
+  });
+}
+function render(){
+  const done = new Set(state.days[today] || []);
+  document.querySelectorAll("input[data-id]").forEach(i => i.checked = done.has(i.dataset.id));
+  document.getElementById("count").textContent = done.size + " of " + ids.length + " done today";
+  document.getElementById("fill").style.width = (100*done.size/ids.length) + "%";
+  const wk = document.getElementById("week"); wk.textContent = "";
+  for (let n = 6; n >= 0; n--) {
+    const d = new Date(); d.setDate(d.getDate()-n);
+    const c = (state.days[dk(d)] || []).length;
+    const s = document.createElement("span");
+    s.className = "dot" + (c>=6 ? " full" : c>0 ? " some" : "") + (n===0 ? " now" : "");
+    s.textContent = d.toLocaleDateString(undefined,{weekday:"narrow"});
+    s.title = c + " done";
+    wk.append(s);
+  }
+}
+const n = state.notes[today] || {};
+const win = document.getElementById("win"), tr = document.getElementById("try");
+win.value = n.win || ""; tr.value = n.tr || "";
+function saveNotes(){ state.notes[today] = {win:win.value, tr:tr.value}; save(); }
+win.addEventListener("input", saveNotes); tr.addEventListener("input", saveNotes);
+document.getElementById("reset").addEventListener("click", () => { state.days[today] = []; save(); render(); });
+render();
+</script>
+</body>
+</html>
